@@ -7,6 +7,7 @@ import Usuario from "../../model/Usuario";
 interface AuthContextProps {
   usuario?: Usuario;
   loginGoogle?: () => Promise<void>;
+  logout?: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps>({});
@@ -53,9 +54,24 @@ export function AuthProvider(props) {
   }
 
   async function loginGoogle() {
-    const resp = await firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider());
-    configurarSessao(resp.user);
-    router.push("/");
+    try {
+      setCarregando(true);
+      const resp = await firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider());
+      configurarSessao(resp.user);
+      router.push("/");
+    } finally {
+      setCarregando(false);
+    }
+  }
+
+  async function logout() {
+    try {
+      setCarregando(true);
+      await firebase.auth().signOut();
+      await configurarSessao(null);
+    } finally {
+      setCarregando(false);
+    }
   }
 
   useEffect(() => {
@@ -67,7 +83,7 @@ export function AuthProvider(props) {
     }
   }, []);
 
-  return <AuthContext.Provider value={{ usuario, loginGoogle }}>{props.children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ usuario, loginGoogle, logout }}>{props.children}</AuthContext.Provider>;
 }
 
 export default AuthContext;
