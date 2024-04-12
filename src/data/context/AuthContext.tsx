@@ -8,8 +8,8 @@ interface AuthContextProps {
   usuario?: Usuario;
   carregando?: boolean;
   cadastrar?: (email: string, senha: string) => Promise<void>;
-  login?: (email: string, senha: string) => Promise<void>;
   loginGoogle?: () => Promise<void>;
+  login?: (email: string, senha: string) => Promise<void>;
   logout?: () => Promise<void>;
 }
 
@@ -60,7 +60,6 @@ export function AuthProvider(props) {
     try {
       setCarregando(true);
       const resp = await firebase.auth().signInWithEmailAndPassword(email, senha);
-
       await configurarSessao(resp.user);
       route.push("/");
     } finally {
@@ -116,9 +115,9 @@ export function AuthProvider(props) {
       value={{
         usuario,
         carregando,
-        login,
         cadastrar,
         loginGoogle,
+        login,
         logout,
       }}
     >
