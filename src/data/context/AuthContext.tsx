@@ -1,4 +1,4 @@
-import router from "next/router";
+import route from "next/router";
 import { createContext, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import firebase from "../../firebase/config";
@@ -6,6 +6,9 @@ import Usuario from "../../model/Usuario";
 
 interface AuthContextProps {
   usuario?: Usuario;
+  carregando?: boolean;
+  cadastrar?: (email: string, senha: string) => Promise<void>;
+  login?: (email: string, senha: string) => Promise<void>;
   loginGoogle?: () => Promise<void>;
   logout?: () => Promise<void>;
 }
@@ -53,12 +56,37 @@ export function AuthProvider(props) {
     }
   }
 
+  async function login(email, senha) {
+    try {
+      setCarregando(true);
+      const resp = await firebase.auth().signInWithEmailAndPassword(email, senha);
+
+      await configurarSessao(resp.user);
+      route.push("/");
+    } finally {
+      setCarregando(false);
+    }
+  }
+
+  async function cadastrar(email, senha) {
+    try {
+      setCarregando(true);
+      const resp = await firebase.auth().createUserWithEmailAndPassword(email, senha);
+
+      await configurarSessao(resp.user);
+      route.push("/");
+    } finally {
+      setCarregando(false);
+    }
+  }
+
   async function loginGoogle() {
     try {
       setCarregando(true);
       const resp = await firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider());
-      configurarSessao(resp.user);
-      router.push("/");
+
+      await configurarSessao(resp.user);
+      route.push("/");
     } finally {
       setCarregando(false);
     }
@@ -83,7 +111,20 @@ export function AuthProvider(props) {
     }
   }, []);
 
-  return <AuthContext.Provider value={{ usuario, loginGoogle, logout }}>{props.children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      value={{
+        usuario,
+        carregando,
+        login,
+        cadastrar,
+        loginGoogle,
+        logout,
+      }}
+    >
+      {props.children}
+    </AuthContext.Provider>
+  );
 }
 
 export default AuthContext;
