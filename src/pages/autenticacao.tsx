@@ -32,8 +32,8 @@ export default function Autenticacao() {
     <div className={`flex h-screen items-center justify-center`}>
       <div className="hidden md:block md:w-1/2 lg:w-2/3">
         <img
-          className="h-screen w-full object-cover"
-          src="https://source.unsplash.com/random"
+          className="object-cover w-full h-screen"
+          src="https://loremflickr.com/1600/900"
           alt="Imagem da Tela de Autenticação"
         />
       </div>
@@ -63,12 +63,12 @@ export default function Autenticacao() {
         >
           {modo === "login" ? "Entrar" : "Cadastrar"}
         </button>
-        <hr className="my-6 border-gray-300 w-full" />
+        <hr className="w-full my-6 border-gray-300" />
         <button
           onClick={loginGoogle}
           className={`flex items-center justify-center gap-3 w-full bg-red-500 hover:bg-red-400 text-white rounded-lg px-4 py-3`}
         >
-          <span className="bg-white rounded-full p-1/2 flex items-center justify-center">{IconeGoogle}</span>
+          <span className="flex items-center justify-center bg-white rounded-full p-1/2">{IconeGoogle}</span>
           <span className="flex-grow">Entrar com Google</span>
         </button>
         {modo === "login" ? (
